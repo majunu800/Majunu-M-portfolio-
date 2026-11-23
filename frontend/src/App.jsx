@@ -1,36 +1,43 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Import Components
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import CursorDots from './components/CursorDots';
+import SplashCursor from './components/SplashCursor';
 import About from './components/About';
+import WhatIBuild from './components/WhatIBuild';
 import Skills from './components/Skills';
 import Experience from './components/Experience';
 import Education from './components/Education';
+import CareerObjective from './components/CareerObjective';
+import ProfessionalJourney from './components/ProfessionalJourney';
+import WhyWorkWithMe from './components/WhyWorkWithMe';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 
-// Import Admin Views
+// Import Admin Views (kept for backend compatibility)
 import Login from './admin/Login';
 import Dashboard from './admin/Dashboard';
 
 // Main Portfolio Page Layout
 const PortfolioMain = () => {
   return (
-    <>
+    <div className="relative bg-bg-darker min-h-screen text-text-primary selection:bg-primary/30 selection:text-white">
       <Navbar />
       <Hero />
       <About />
-      <Skills />
+      <WhatIBuild />
       <Experience />
-      <Education />
       <Projects />
+      <Skills />
+      <Education />
+      <CareerObjective />
+      <ProfessionalJourney />
+      <WhyWorkWithMe />
       <Contact />
       <Footer />
-    </>
+    </div>
   );
 };
 
@@ -43,7 +50,23 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <CursorDots count={12} />
+      <SplashCursor
+        rainbow={false}
+        size={1}
+        force={1}
+        swirl={3}
+        trail={1}
+        clickSplash
+        colorSpeed={1}
+        intensity={1}
+        momentum={1}
+        shading={1}
+        glow={0}
+        quality="high"
+        intro
+        contained={false}
+      />
+      
       {/* Dynamic Background Glow Blobs */}
       <div className="bg-glow-container">
         <div className="bg-glow-1"></div>
@@ -56,10 +79,10 @@ function App() {
 
         {/* Admin Login Route */}
         <Route path="/admin" element={
-          <>
+          <div className="bg-bg-darker min-h-screen text-text-primary">
             <Navbar />
             <Login />
-          </>
+          </div>
         } />
 
         {/* Protected Admin Dashboard Route */}

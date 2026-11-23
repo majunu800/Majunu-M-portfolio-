@@ -3,7 +3,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
-// Load environment variables
+// Load environment variables from .env file
+// Required keys: MONGO_URI, JWT_SECRET, PORT
 dotenv.config();
 
 // Connect to MongoDB

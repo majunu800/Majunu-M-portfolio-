@@ -19,7 +19,8 @@ const protect = async (req, res, next) => {
   }
 
   try {
-    // Verify token
+    // Verify JWT token using JWT_SECRET from .env file
+    // Generate secure secret: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret_key_change_me_in_production');
 
     req.user = await User.findById(decoded.id);

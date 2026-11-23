@@ -1,0 +1,39 @@
+:root {
+    --primary: #6366f1;
+    --bg: #0f172a;
+    --glass: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    background-color: var(--bg);
+    color: white;
+    cursor: none; /* Hide default cursor to use custom one */
+}
+
+.glass-nav {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    padding: 1rem 2rem;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 1000;
+}
+
+/* Custom Cursor Styling */
+.cursor {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+}

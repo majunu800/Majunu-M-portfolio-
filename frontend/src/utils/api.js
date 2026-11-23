@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+// API Base URL from a Vite environment variable.
+// Use `.env.local` for local development and Render env vars for deployments.
+// Example: VITE_API_URL=http://localhost:5000/api
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');
@@ -27,7 +30,7 @@ export const apiRequest = async (endpoint, method = 'GET', body = null) => {
     const response = await fetch(url, options);
     // Try parse JSON safely
     let data = null;
-    try { data = await response.json(); } catch (err) { data = null; }
+    try { data = await response.json(); } catch { data = null; }
 
     if (!response.ok) {
       // Auto-handle unauthorized: clear token and redirect to admin login

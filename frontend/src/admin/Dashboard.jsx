@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../utils/api';
 
@@ -17,14 +17,53 @@ const Dashboard = () => {
   const [expForm, setExpForm] = useState({ company: '', role: '', location: '', startDate: '', endDate: '', current: false, description: '' });
   const [eduForm, setEduForm] = useState({ institution: '', degree: '', fieldOfStudy: '', startDate: '', endDate: '', current: false, description: '' });
 
+  const fetchItems = useCallback(() => apiRequest(`/${activeTab}`), [activeTab]);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/admin');
-    } else {
-      fetchItems();
+      return;
     }
-  }, [activeTab, navigate]);
+
+    let isActive = true;
+    fetchItems()
+      .then((res) => {
+        if (isActive && res.success) {
+          setItems(res.data);
+        }
+      })
+      .catch((err) => {
+        if (isActive) {
+          console.error('Failed to fetch data for admin dashboard', err);
+          setItems([]);
+        }
+      })
+      .finally(() => {
+        if (isActive) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [fetchItems, navigate]);
+
+  const refreshItems = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchItems();
+      if (res.success) {
+        setItems(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch data for admin dashboard', err);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -32,20 +71,10 @@ const Dashboard = () => {
     navigate('/admin');
   };
 
-  const fetchItems = async () => {
-    setLoading(true);
-    try {
-      let endpoint = `/${activeTab}`;
-      const res = await apiRequest(endpoint);
-      if (res.success) {
-        setItems(res.data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch data for admin dashboard', err);
-      // Fallback empty list
-      setItems([]);
-    } finally {
-      setLoading(false);
+  const handleTabChange = (tab) => {
+    if (tab !== activeTab) {
+      setLoading(true);
+      setActiveTab(tab);
     }
   };
 
@@ -55,7 +84,8 @@ const Dashboard = () => {
       try {
         await apiRequest(`/${activeTab}/${id}`, 'DELETE');
         setStatusMsg('Deleted successfully');
-        fetchItems();
+        setLoading(true);
+        refreshItems();
       } catch (err) {
         setStatusMsg(err.message || 'Delete operation failed');
       }
@@ -152,7 +182,8 @@ const Dashboard = () => {
         setStatusMsg('Created successfully');
       }
       setShowModal(false);
-      fetchItems();
+      setLoading(true);
+      refreshItems();
     } catch (err) {
       setStatusMsg(err.message || 'Operation failed');
     }
@@ -162,7 +193,8 @@ const Dashboard = () => {
     try {
       await apiRequest(`/messages/${id}/read`, 'PUT');
       setStatusMsg('Marked as read');
-      fetchItems();
+      setLoading(true);
+      refreshItems();
     } catch (err) {
       setStatusMsg(err.message || 'Failed to mark as read');
     }
@@ -178,7 +210,7 @@ const Dashboard = () => {
             <li className="admin-sidebar-item">
               <button 
                 className={`admin-sidebar-link ${activeTab === 'projects' ? 'active' : ''}`}
-                onClick={() => setActiveTab('projects')}
+                onClick={() => handleTabChange('projects')}
               >
                 <i className="fas fa-project-diagram"></i> Projects
               </button>
@@ -186,7 +218,7 @@ const Dashboard = () => {
             <li className="admin-sidebar-item">
               <button 
                 className={`admin-sidebar-link ${activeTab === 'skills' ? 'active' : ''}`}
-                onClick={() => setActiveTab('skills')}
+                onClick={() => handleTabChange('skills')}
               >
                 <i className="fas fa-brain"></i> Skills
               </button>
@@ -194,7 +226,7 @@ const Dashboard = () => {
             <li className="admin-sidebar-item">
               <button 
                 className={`admin-sidebar-link ${activeTab === 'experience' ? 'active' : ''}`}
-                onClick={() => setActiveTab('experience')}
+                onClick={() => handleTabChange('experience')}
               >
                 <i className="fas fa-briefcase"></i> Experience
               </button>
@@ -202,7 +234,7 @@ const Dashboard = () => {
             <li className="admin-sidebar-item">
               <button 
                 className={`admin-sidebar-link ${activeTab === 'education' ? 'active' : ''}`}
-                onClick={() => setActiveTab('education')}
+                onClick={() => handleTabChange('education')}
               >
                 <i className="fas fa-graduation-cap"></i> Education
               </button>
@@ -210,7 +242,7 @@ const Dashboard = () => {
             <li className="admin-sidebar-item">
               <button 
                 className={`admin-sidebar-link ${activeTab === 'messages' ? 'active' : ''}`}
-                onClick={() => setActiveTab('messages')}
+                onClick={() => handleTabChange('messages')}
               >
                 <i className="fas fa-envelope"></i> Messages
               </button>
